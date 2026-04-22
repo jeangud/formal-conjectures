@@ -48,9 +48,10 @@ https://github.com/logical-intelligence/proofs, see
 and informal sketch of the proof.
 -/
 @[category research solved, AMS 60, formal_proof using lean4 at "https://github.com/logical-intelligence/proofs/blob/0dbb9215f472c532ca8af1376ed58a7ebca6dec2/LI/Conj63.lean#L8845"]
-theorem arxiv.id0911_2077.conjecture6_3
-    (p : ℝ) (h_p : p ∈ Set.Ioo 0 (1 / 2)) (k : ℕ) (hk : 0 < k)
-    (σ : ℝ) (h_σ : σ = (p * (1 - p)).sqrt) :
+theorem arxiv.id0911_2077.conjecture6_3 :
+  answer(True) ↔
+    ∀ (p : ℝ) (h_p : p ∈ Set.Ioo 0 (1 / 2)) (k : ℕ) (hk : 0 < k)
+    (σ : ℝ) (h_σ : σ = (p * (1 - p)).sqrt),
     letI hp' : (⟨p, le_of_lt h_p.1⟩ : ℝ≥0) ≤ 1 := by
       have : p ≤ 1 :=  le_trans (le_of_lt (Set.mem_Ioo.mp h_p).right) (by linarith)
       exact this

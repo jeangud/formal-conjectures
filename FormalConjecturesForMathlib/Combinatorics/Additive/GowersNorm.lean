@@ -33,3 +33,17 @@ The multiplicative derivative $\Delta_h f(x) = f(x) \overline{f(x+h)}$.
 -/
 noncomputable def multiplicativeDerivative {G : Type*} [AddGroup G] (h : G) (f : G → ℂ) : G → ℂ :=
   fun x ↦ f x * star (f (x + h))
+
+/--
+The $2^d$-th power of the $U^d$ Gowers norm of a function $f : G \to \mathbb{C}$ on a finite group $G$.
+Defined inductively:
+$\lVert f \rVert_{U^1}^2 = |\mathbb{E}_x f(x)|^2$
+$\lVert f \rVert_{U^{d+1}}^{2^{d+1}} = \mathbb{E}_h \lVert \Delta_h f \rVert_{U^d}^{2^d}$
+-/
+noncomputable def gowersNormPow {G : Type*} [AddCommGroup G] [Fintype G] : ℕ → (G → ℂ) → ℝ
+  | 0, f => ‖(1 / (Nat.card G : ℝ)) * ∑ x : G, f x‖
+  | d + 1, f =>
+    if d = 0 then
+      ‖(1 / (Nat.card G : ℝ)) * ∑ x : G, f x‖^2
+    else
+      (1 / (Nat.card G : ℝ)) * ∑ h : G, gowersNormPow d (multiplicativeDerivative h f)

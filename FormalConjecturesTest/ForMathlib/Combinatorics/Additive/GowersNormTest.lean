@@ -75,3 +75,25 @@ lemma multiplicativeDerivative_phase (h : G) (f : G → ℂ)
     f x * (star (f h) * star (f x)) = (f x * star (f x)) * star (f h) := by ring
     _ = 1 * star (f h) := by rw [h_unit x]
     _ = star (f h) := by ring
+
+open Fintype BigOperators
+
+/-- The Gowers norm is always non-negative. -/
+lemma gowersNormPow_nonneg [Fintype G] (d : ℕ) (f : G → ℂ) :
+    0 ≤ gowersNormPow d f := by
+  induction d generalizing f with
+  | zero =>
+    dsimp [gowersNormPow]
+    positivity
+  | succ d ih =>
+    cases d with
+    | zero =>
+      dsimp [gowersNormPow]
+      positivity
+    | succ d =>
+      dsimp [gowersNormPow]
+      apply mul_nonneg
+      · positivity
+      · apply Finset.sum_nonneg
+        intro h _
+        apply ih

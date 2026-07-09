@@ -41,9 +41,6 @@ $\lVert f \rVert_{U^1}^2 = |\mathbb{E}_x f(x)|^2$
 $\lVert f \rVert_{U^{d+1}}^{2^{d+1}} = \mathbb{E}_h \lVert \Delta_h f \rVert_{U^d}^{2^d}$
 -/
 noncomputable def gowersNormPow {G : Type*} [AddCommGroup G] [Fintype G] : ℕ → (G → ℂ) → ℝ
-  | 0, f => ‖(1 / (Nat.card G : ℝ)) * ∑ x : G, f x‖
-  | d + 1, f =>
-    if d = 0 then
-      ‖(1 / (Nat.card G : ℝ)) * ∑ x : G, f x‖^2
-    else
-      (1 / (Nat.card G : ℝ)) * ∑ h : G, gowersNormPow d (multiplicativeDerivative h f)
+  | 0, f => ‖(Fintype.card G : ℂ)⁻¹ * ∑ x, f x‖
+  | 1, f => ‖(Fintype.card G : ℂ)⁻¹ * ∑ x, f x‖^2
+  | d + 2, f => (Fintype.card G : ℝ)⁻¹ * ∑ h, gowersNormPow (d + 1) (multiplicativeDerivative h f)

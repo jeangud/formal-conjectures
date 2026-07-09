@@ -97,3 +97,35 @@ lemma gowersNormPow_nonneg [Fintype G] (d : ℕ) (f : G → ℂ) :
       · apply Finset.sum_nonneg
         intro h _
         apply ih
+
+lemma multiplicativeDerivative_const_fn {G : Type*} [AddCommGroup G] (h : G) (c : ℂ) :
+    multiplicativeDerivative h (fun _ ↦ c) = fun _ ↦ c * star c := by
+  ext x
+  rfl
+
+/-- The Gowers norm of a constant function is the modulus of the constant to the 2^d power. -/
+lemma gowersNormPow_const {G : Type*} [AddCommGroup G] [Fintype G] [Nonempty G] (c : ℂ) :
+    ∀ (d : ℕ), gowersNormPow d (fun _ : G ↦ c) = ‖c‖ ^ (2 ^ d)
+  | 0 => by
+    have hG : (Fintype.card G : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+    simp [gowersNormPow, Finset.sum_const, nsmul_eq_mul]
+  | 1 => by
+    have hG : (Fintype.card G : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+    simp [gowersNormPow, Finset.sum_const, nsmul_eq_mul]
+  | d + 2 => by
+    have hG : (Fintype.card G : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+    dsimp [gowersNormPow]
+    simp only [multiplicativeDerivative_const_fn]
+    
+    -- The recursive call automatically acts as the inductive hypothesis
+    rw [gowersNormPow_const (c * star c) (d + 1)] 
+    
+    -- Collapse the real sum
+    simp only [Finset.sum_const, nsmul_eq_mul, Finset.card_univ]
+    rw [inv_mul_cancel_left₀ hG]
+    
+    -- Clean up the norms and powers
+    have h_norm : ‖c * star c‖ = ‖c‖ ^ 2 := by rw [norm_mul, star_def, norm_conj, sq]
+    rw [h_norm, ← pow_mul]
+    congr 1
+    ring

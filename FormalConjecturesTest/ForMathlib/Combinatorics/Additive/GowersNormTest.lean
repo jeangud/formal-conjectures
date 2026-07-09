@@ -129,3 +129,27 @@ lemma gowersNormPow_const {G : Type*} [AddCommGroup G] [Fintype G] [Nonempty G] 
     rw [h_norm, ← pow_mul]
     congr 1
     ring
+
+lemma multiplicativeDerivative_add_right_fn {G : Type*} [AddCommGroup G] (h : G) (f : G → ℂ) (y : G) :
+    multiplicativeDerivative h (fun z ↦ f (z + y)) = fun x ↦ multiplicativeDerivative h f (x + y) := by
+  ext x
+  simp [multiplicativeDerivative, add_right_comm]
+
+/-- The Gowers norm is invariant under translation of the input function. -/
+lemma gowersNormPow_translate {G : Type*} [AddCommGroup G] [Fintype G] (f : G → ℂ) (y : G) :
+    ∀ (d : ℕ), gowersNormPow d (fun z ↦ f (z + y)) = gowersNormPow d f
+  | 0 => by
+    dsimp [gowersNormPow]
+    congr 2
+    exact Fintype.sum_equiv (Equiv.addRight y) _ _ (by intro x; rfl)
+  | 1 => by
+    dsimp [gowersNormPow]
+    congr 3
+    exact Fintype.sum_equiv (Equiv.addRight y) _ _ (by intro x; rfl)
+  | d + 2 => by
+    dsimp [gowersNormPow]
+    congr 1
+    apply Finset.sum_congr rfl
+    intro h _
+    rw [multiplicativeDerivative_add_right_fn]
+    exact gowersNormPow_translate (multiplicativeDerivative h f) y (d + 1)

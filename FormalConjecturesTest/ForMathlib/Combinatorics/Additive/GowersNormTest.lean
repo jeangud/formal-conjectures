@@ -30,9 +30,19 @@ lemma multiplicativeDerivative_const (h : G) (c : ℂ) (x : G) :
     multiplicativeDerivative h (fun _ ↦ c) x = c * star c := by
   rfl
 
+lemma multiplicativeDerivative_const_fn {G : Type*} [AddCommGroup G] (h : G) (c : ℂ) :
+    multiplicativeDerivative h (fun _ ↦ c) = fun _ ↦ c * star c := by
+  ext x
+  rfl
+
 /-- The multiplicative derivative is invariant under translation of the input function. -/
 lemma multiplicativeDerivative_add_right (h : G) (f : G → ℂ) (x y : G) :
     multiplicativeDerivative h (fun z ↦ f (z + y)) x = multiplicativeDerivative h f (x + y) := by
+  simp [multiplicativeDerivative, add_right_comm]
+
+lemma multiplicativeDerivative_add_right_fn {G : Type*} [AddCommGroup G] (h : G) (f : G → ℂ) (y : G) :
+    multiplicativeDerivative h (fun z ↦ f (z + y)) = fun x ↦ multiplicativeDerivative h f (x + y) := by
+  ext x
   simp [multiplicativeDerivative, add_right_comm]
 
 /-- The multiplicative derivative distributes over the product of two functions. -/
@@ -98,11 +108,6 @@ lemma gowersNormPow_nonneg [Fintype G] (d : ℕ) (f : G → ℂ) :
         intro h _
         apply ih
 
-lemma multiplicativeDerivative_const_fn {G : Type*} [AddCommGroup G] (h : G) (c : ℂ) :
-    multiplicativeDerivative h (fun _ ↦ c) = fun _ ↦ c * star c := by
-  ext x
-  rfl
-
 /-- The Gowers norm of a constant function is the modulus of the constant to the 2^d power. -/
 lemma gowersNormPow_const {G : Type*} [AddCommGroup G] [Fintype G] [Nonempty G] (c : ℂ) :
     ∀ (d : ℕ), gowersNormPow d (fun _ : G ↦ c) = ‖c‖ ^ (2 ^ d)
@@ -116,24 +121,19 @@ lemma gowersNormPow_const {G : Type*} [AddCommGroup G] [Fintype G] [Nonempty G] 
     have hG : (Fintype.card G : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
     dsimp [gowersNormPow]
     simp only [multiplicativeDerivative_const_fn]
-    
+
     -- The recursive call automatically acts as the inductive hypothesis
-    rw [gowersNormPow_const (c * star c) (d + 1)] 
-    
+    rw [gowersNormPow_const (c * star c) (d + 1)]
+
     -- Collapse the real sum
     simp only [Finset.sum_const, nsmul_eq_mul, Finset.card_univ]
     rw [inv_mul_cancel_left₀ hG]
-    
+
     -- Clean up the norms and powers
     have h_norm : ‖c * star c‖ = ‖c‖ ^ 2 := by rw [norm_mul, star_def, norm_conj, sq]
     rw [h_norm, ← pow_mul]
     congr 1
     ring
-
-lemma multiplicativeDerivative_add_right_fn {G : Type*} [AddCommGroup G] (h : G) (f : G → ℂ) (y : G) :
-    multiplicativeDerivative h (fun z ↦ f (z + y)) = fun x ↦ multiplicativeDerivative h f (x + y) := by
-  ext x
-  simp [multiplicativeDerivative, add_right_comm]
 
 /-- The Gowers norm is invariant under translation of the input function. -/
 lemma gowersNormPow_translate {G : Type*} [AddCommGroup G] [Fintype G] (f : G → ℂ) (y : G) :
@@ -153,3 +153,5 @@ lemma gowersNormPow_translate {G : Type*} [AddCommGroup G] [Fintype G] (f : G �
     intro h _
     rw [multiplicativeDerivative_add_right_fn]
     exact gowersNormPow_translate (multiplicativeDerivative h f) y (d + 1)
+
+-- TODO(jgd) Complete with additional lemmas for a semi-norms. norms.
